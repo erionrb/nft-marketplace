@@ -9,7 +9,8 @@ module.exports = {
       chainId: 1337
     },
     mumbai: {
-      url: `https://polygon-mumbai.infura.io/v3/${projectId}`,
+      //url: `https://polygon-mumbai.infura.io/v3/${projectId}`,
+      url: 'https://rpc-mumbai.maticvigil.com/',
       accounts: [privateKey]
     },
     mainet: {
