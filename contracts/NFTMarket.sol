@@ -57,15 +57,15 @@ contract NFTMarket is ReentrancyGuard {
         _itemIds.increment();
         uint256 itemId = _itemIds.current();
 
-        idToMarketItem[itemId] = MarketItem({
-            itemId: itemId,
-            nftContract: nftContract,
-            tokenId: tokenId,
-            seller: payable(msg.sender),
-            owner: payable(address(0)),
-            price: price,
-            sold: false
-        });
+        idToMarketItem[itemId] = MarketItem(
+            itemId,
+            nftContract,
+            tokenId,
+            payable(msg.sender),
+            payable(address(0)),
+            price,
+            false
+        );
 
         IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
 
@@ -73,8 +73,8 @@ contract NFTMarket is ReentrancyGuard {
             itemId,
             nftContract,
             tokenId,
-            payable(msg.sender),
-            payable(address(0)),
+            msg.sender,
+            address(0),
             price,
             false
         );
@@ -89,7 +89,7 @@ contract NFTMarket is ReentrancyGuard {
         uint256 tokenId = idToMarketItem[itemId].tokenId;
         require(
             msg.value == price,
-            "Please submit the asking in order to complete the purchase"
+            "Please submit the asking price in order to complete the purchase"
         );
 
         idToMarketItem[itemId].seller.transfer(msg.value);
@@ -148,21 +148,24 @@ contract NFTMarket is ReentrancyGuard {
         uint256 currentIndex = 0;
 
         for (uint256 i = 0; i < totalItemCount; i++) {
+            console.log("Item Seller: %s", idToMarketItem[i + 1].seller);
+            console.log("Sender: %s", msg.sender);
             if (idToMarketItem[i + 1].seller == msg.sender) {
                 itemCount += 1;
             }
         }
 
+        console.log("User total item count: %d", itemCount);
+
         MarketItem[] memory items = new MarketItem[](itemCount);
         for (uint256 i = 0; i < totalItemCount; i++) {
             if (idToMarketItem[i + 1].seller == msg.sender) {
-                uint256 currentId = idToMarketItem[i + 1].itemId;
+                uint256 currentId = i + 1;
                 MarketItem storage currentItem = idToMarketItem[currentId];
                 items[currentIndex] = currentItem;
                 currentIndex += 1;
             }
         }
-
         return items;
     }
 }
